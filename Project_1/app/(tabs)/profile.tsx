@@ -7,7 +7,6 @@ import { ActivityIndicator, Alert, Image, Platform, ScrollView, StyleSheet, Text
 import apiClient from '../../api/axiosConfig';
 import { useSound } from '../../hooks/useSound';
 
-
 interface UserProfile {
     username: string;
     email: string;
@@ -36,7 +35,6 @@ export default function ProfileScreen() {
     const playSound = useSound();
 
     const fetchProfileData = async () => {
-
         try {
             const response = await apiClient.get('/api/dashboard/profile');
             setUserProfile(response.data);
@@ -51,7 +49,6 @@ export default function ProfileScreen() {
     };
 
     useFocusEffect(React.useCallback(() => {
-
         if (!userProfile) {
             setIsLoading(true);
         }
@@ -129,24 +126,23 @@ export default function ProfileScreen() {
     }
 
     const progressPercent = userProfile.xpToNextLevel > 0 ? (userProfile.xpForCurrentLevel / userProfile.xpToNextLevel) * 100 : 0;
-
-    // --- TẠO URL ĐẦY ĐỦ CHO ẢNH ĐẠI DIỆN ---
     const fullAvatarUrl = `${apiClient.defaults.baseURL}/uploads/${userProfile.avatarUrl}`;
 
     return (
         <LinearGradient colors={['#fde6f3', '#e4eefd', '#f0eaff']} style={styles.container}>
             <ScrollView contentContainerStyle={styles.scrollContent}>
+                
+                {/* --- AVATAR SECTION --- */}
                 <View style={styles.glassCard}>
-
                     <Image
                         key={fullAvatarUrl}
                         source={{ uri: fullAvatarUrl }}
                         style={styles.avatar}
                     />
                     <Text style={styles.name}>{userProfile.username}</Text>
-
                 </View>
 
+                {/* --- PROGRESS SECTION --- */}
                 <View style={styles.glassCard}>
                     <Text style={styles.cardTitle}>Progress Overview</Text>
                     <Text style={styles.levelText}>Level {userProfile.level}: {userProfile.xpForCurrentLevel.toLocaleString()} / {userProfile.xpToNextLevel.toLocaleString()} XP</Text>
@@ -157,21 +153,8 @@ export default function ProfileScreen() {
                         <Text style={styles.stat}><FontAwesome5 name="trophy" /> 0 Wins</Text>
                     </View>
                 </View>
-                <View style={styles.glassCard}>
-                    <Text style={styles.cardTitle}>Badge Collection</Text>
-                    <View style={styles.badgeGrid}>
-                        <View style={styles.badge}><MaterialCommunityIcons name="calendar-check" size={32} color="#8B5CF6" /></View>
-                        <View style={styles.badge}><MaterialCommunityIcons name="book-open-variant" size={32} color="#8B5CF6" /></View>
-                        <View style={styles.badge}><MaterialCommunityIcons name="star-circle" size={32} color="#8B5CF6" /></View>
-                        <View style={[styles.badge, styles.badgeLocked]}><MaterialCommunityIcons name="lock" size={32} color="#9CA3AF" /></View>
-                        <View style={styles.badge}><MaterialCommunityIcons name="shield-check" size={32} color="#8B5CF6" /></View>
-                        <View style={styles.badge}><MaterialCommunityIcons name="one-up" size={32} color="#8B5CF6" /></View>
-                        <View style={[styles.badge, styles.badgeLocked]}><MaterialCommunityIcons name="lock" size={32} color="#9CA3AF" /></View>
-                        <View style={[styles.badge, styles.badgeLocked]}><MaterialCommunityIcons name="lock" size={32} color="#9CA3AF" /></View>
-                    </View>
-                </View>
 
-
+                {/* --- SETTINGS SECTION --- */}
                 <View style={styles.glassCard}>
                     <Text style={styles.cardTitle}>Settings</Text>
 
@@ -180,8 +163,6 @@ export default function ProfileScreen() {
                         text="Edit Profile"
                         action={() => handlePressWithSound(() => router.push('/editProfile'))}
                     />
-
-
 
                     <SettingsRow
                         icon="shield-lock-outline"
@@ -198,7 +179,6 @@ export default function ProfileScreen() {
     );
 }
 
-// --- Styles  ---
 const styles = StyleSheet.create({
     centered: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f0eaff' },
     container: { flex: 1 },
@@ -212,9 +192,6 @@ const styles = StyleSheet.create({
     progressBar: { height: '100%', backgroundColor: '#8B5CF6', borderRadius: 4 },
     statsContainer: { flexDirection: 'row', justifyContent: 'space-between', width: '100%' },
     stat: { fontSize: 14, color: '#4B5563' },
-    badgeGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-around' },
-    badge: { width: 60, height: 60, borderRadius: 30, backgroundColor: 'rgba(139, 92, 246, 0.1)', justifyContent: 'center', alignItems: 'center', margin: 5 },
-    badgeLocked: { backgroundColor: 'rgba(0,0,0,0.05)' },
     settingsRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%', paddingVertical: 12 },
     settingsText: { fontSize: 16, color: '#374151', marginLeft: 15 },
 });

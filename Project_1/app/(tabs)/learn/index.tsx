@@ -1,146 +1,234 @@
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useFocusEffect, useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { ActivityIndicator, FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import * as Progress from 'react-native-progress';
 import apiClient from '../../../api/axiosConfig';
 import { useSound } from '../../../hooks/useSound';
 
 interface Deck {
     _id: string;
     name: string;
-    iconName: keyof typeof Ionicons.glyphMap;
     wordCount: number;
-    progress?: number;
-    isCompleted?: boolean;
+    progress: number;
+    iconName: string;
 }
 
-const TopicCard = ({ deck, onPress }: { deck: Deck; onPress: () => void }) => {
-    const isCompleted = deck.isCompleted || deck.progress === 100;
-
-    return (
-        <TouchableOpacity style={styles.deckCard} onPress={onPress}>
-            <View style={styles.deckIconContainer}>
-                <Ionicons name={deck.iconName} size={24} color="#8B5CF6" />
-            </View>
-            <View style={styles.deckInfo}>
-                <Text style={styles.deckName}>{deck.name}</Text>
-                <Text style={styles.deckWordCount}>{deck.wordCount} Words</Text>
-                <View style={styles.progressBarContainer}>
-                    <View style={[styles.progressBar, { width: `${deck.progress || 0}%` }]} />
-                </View>
-            </View>
-            {isCompleted && <Ionicons name="checkmark-circle" size={24} color="#22C55E" style={{ marginRight: 10 }} />}
-            <Ionicons name="chevron-forward" size={24} color="#9CA3AF" />
-        </TouchableOpacity>
-    );
-};
-
-export default function ChooseTopicScreen() {
+export default function LearnScreen() {
     const [decks, setDecks] = useState<Deck[]>([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+    const [searchQuery, setSearchQuery] = useState('');
+
+    // State để kiểm tra xem người dùng có đang bấm vào ô tìm kiếm không
+    const [isFocused, setIsFocused] = useState(false);
+
     const router = useRouter();
     const playSound = useSound();
 
     const fetchDecks = async () => {
-        setIsLoading(true);
         try {
             const response = await apiClient.get('/api/decks');
             setDecks(response.data);
-            setError(null);
-        } catch (err: any) {
-            console.error("Lỗi khi lấy danh sách bộ từ:", err);
-            if (err.response?.status === 401) {
-                router.replace('/');
-            } else {
-                setError("Không thể tải danh sách chủ đề. Vui lòng thử lại.");
-            }
+        } catch (error) {
+            console.error("Lỗi lấy danh sách bộ từ:", error);
         } finally {
             setIsLoading(false);
         }
     };
 
-    useFocusEffect(React.useCallback(() => {
-        fetchDecks();
-    }, []));
+    useFocusEffect(
+        React.useCallback(() => {
+            fetchDecks();
+        }, [])
+    );
 
-
-    const handleTopicPress = (deckId: string) => {
+    const handleDeckPress = (deckId: string) => {
         playSound('click');
         router.push(`/learn/deck/${deckId}`);
     };
 
+    const filteredDecks = decks.filter(deck =>
+        deck.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
     if (isLoading) {
         return (
             <LinearGradient colors={['#fde6f3', '#e4eefd', '#f0eaff']} style={styles.centered}>
-                <ActivityIndicator size="large" color="#8B5CF6" />
-            </LinearGradient>
-        );
-    }
-
-    if (error) {
-        return (
-            <LinearGradient colors={['#fde6f3', '#e4eefd', '#f0eaff']} style={styles.centered}>
-                <Text style={styles.errorText}>{error}</Text>
-                <TouchableOpacity onPress={fetchDecks}>
-                    <Text style={styles.retryButton}>Thử lại</Text>
-                </TouchableOpacity>
+                <ActivityIndicator size="large" color="#A78BFA" />
             </LinearGradient>
         );
     }
 
     return (
         <LinearGradient colors={['#fde6f3', '#e4eefd', '#f0eaff']} style={styles.container}>
-            <FlatList
-                data={decks}
-                keyExtractor={(item) => item._id}
-                renderItem={({ item }) => (
-                    <TopicCard
-                        deck={item}
+            <View style={styles.header}>
+                <Text style={styles.title}>Choose Your Topic</Text>
+            </View>
 
-                        onPress={() => handleTopicPress(item._id)}
-                    />
+            {/* --- SEARCH BAR NÂNG CẤP --- */}
+            <View style={[
+                styles.searchContainer,
+                isFocused && styles.searchContainerFocused // Đổi style khi focus
+            ]}>
+                <Ionicons
+                    name="search"
+                    size={22}
+                    // Icon đổi màu khi focus
+                    color={isFocused ? "#8B5CF6" : "#9CA3AF"}
+                    style={styles.searchIcon}
+                />
+                <TextInput
+                    style={[
+                        styles.searchInput,
+                        Platform.OS === 'web' && ({ outlineStyle: 'none' } as any)
+                    ]}
+                    placeholder="Search for topics..."
+                    placeholderTextColor="#9CA3AF"
+                    value={searchQuery}
+                    onChangeText={setSearchQuery}
+                    autoCorrect={false}
+
+                    // Xử lý sự kiện Focus/Blur để đổi giao diện
+                    onFocus={() => setIsFocused(true)}
+                    onBlur={() => setIsFocused(false)}
+
+                    // Màu con trỏ và màu bôi đen
+                    cursorColor="#8B5CF6"
+                    selectionColor="rgba(139, 92, 246, 0.3)"
+                />
+                {searchQuery.length > 0 && (
+                    <TouchableOpacity onPress={() => setSearchQuery('')}>
+                        <Ionicons name="close-circle" size={20} color="#9CA3AF" />
+                    </TouchableOpacity>
                 )}
-                contentContainerStyle={styles.listContent}
-                ListHeaderComponent={(
-                    <>
-                        <Text style={styles.title}>Choose Your Topic</Text>
-                        <View style={styles.searchContainer}>
-                            <Ionicons name="search" size={20} color="#9CA3AF" style={styles.searchIcon} />
-                            <TextInput
-                                placeholder="Search for topics..."
-                                style={styles.searchInput}
-                                placeholderTextColor="#9CA3AF"
-                            />
-                        </View>
-                    </>
+            </View>
+
+            <ScrollView
+                contentContainerStyle={styles.scrollContent}
+                keyboardShouldPersistTaps="handled"
+            >
+                {filteredDecks.length > 0 ? (
+                    filteredDecks.map((deck) => (
+                        <TouchableOpacity
+                            key={deck._id}
+                            style={styles.deckCard}
+                            onPress={() => handleDeckPress(deck._id)}
+                            activeOpacity={0.9}
+                        >
+                            <View style={styles.iconContainer}>
+                                <Ionicons
+                                    name={deck.iconName as any || 'book'}
+                                    size={32}
+                                    color="#8B5CF6"
+                                />
+                            </View>
+
+                            <View style={styles.cardContent}>
+                                <View style={styles.cardHeader}>
+                                    <Text style={styles.deckName}>{deck.name}</Text>
+                                    <MaterialCommunityIcons name="chevron-right" size={24} color="#9CA3AF" />
+                                </View>
+
+                                <Text style={styles.wordCount}>{deck.wordCount} Words</Text>
+
+                                <View style={styles.progressWrapper}>
+                                    <Progress.Bar
+                                        progress={deck.progress / 100}
+                                        width={null}
+                                        height={6}
+                                        color="#A78BFA"
+                                        unfilledColor="#E5E7EB"
+                                        borderWidth={0}
+                                        style={{ flex: 1, marginRight: 10 }}
+                                    />
+                                </View>
+                            </View>
+                        </TouchableOpacity>
+                    ))
+                ) : (
+                    <View style={styles.emptyState}>
+                        <MaterialCommunityIcons name="text-search" size={48} color="#D1D5DB" />
+                        <Text style={styles.emptyText}>No topics found matching &quot;{searchQuery}&quot;</Text>
+                    </View>
                 )}
-            />
+            </ScrollView>
         </LinearGradient>
     );
 }
 
-
 const styles = StyleSheet.create({
-    centered: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 },
+    centered: { flex: 1, justifyContent: 'center', alignItems: 'center' },
     container: { flex: 1 },
-    listContent: { padding: 20, paddingTop: 60, paddingBottom: 100 },
-    title: { fontSize: 28, fontWeight: 'bold', color: '#1F2937', textAlign: 'center', marginBottom: 20 },
-    searchContainer: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255, 255, 255, 0.7)', borderRadius: 30, paddingHorizontal: 15, marginBottom: 20 },
-    searchIcon: { marginRight: 10 },
-    searchInput: { flex: 1, height: 50, fontSize: 16, color: '#1F2937' },
-    deckCard: {
-        flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255, 255, 255, 0.8)',
-        borderRadius: 20, padding: 15, marginBottom: 15,
-        borderWidth: 1, borderColor: 'rgba(255, 255, 255, 1)',
+    header: { paddingTop: 60, paddingBottom: 20, paddingHorizontal: 20, alignItems: 'center' },
+    title: { fontSize: 28, fontWeight: 'bold', color: '#1F2937' },
+
+    // --- Search Bar Styles (Đã nâng cấp) ---
+    searchContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#fff',
+        marginHorizontal: 20,
+        marginBottom: 20,
+        paddingHorizontal: 15,
+        height: 55, // Cao hơn một chút cho dễ bấm
+        borderRadius: 16, // Bo góc vừa phải, hiện đại hơn
+        borderWidth: 1.5,
+        borderColor: 'transparent', // Mặc định không viền màu
+
+        // Bóng đổ nhẹ mặc định
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.05,
+        shadowRadius: 5,
+        elevation: 2,
     },
-    deckIconContainer: { width: 50, height: 50, borderRadius: 15, backgroundColor: 'rgba(139, 92, 246, 0.1)', justifyContent: 'center', alignItems: 'center', marginRight: 15 },
-    deckInfo: { flex: 1 },
+    // Style khi đang bấm vào (Focus)
+    searchContainerFocused: {
+        borderColor: '#8B5CF6', // Viền tím sáng lên
+        backgroundColor: '#F5F3FF', // Nền chuyển sang tím cực nhạt
+        shadowColor: "#8B5CF6", // Bóng đổ màu tím
+        shadowOpacity: 0.2,
+        shadowRadius: 8,
+        elevation: 5,
+    },
+    searchIcon: { marginRight: 10 },
+    searchInput: {
+        flex: 1,
+        fontSize: 16,
+        color: '#1F2937',
+        height: '100%',
+        fontWeight: '500' // Chữ đậm hơn một chút cho rõ
+    },
+
+    scrollContent: { paddingHorizontal: 20, paddingBottom: 100 },
+
+    // Deck Card Styles
+    deckCard: {
+        flexDirection: 'row',
+        backgroundColor: '#fff',
+        borderRadius: 20,
+        padding: 15,
+        marginBottom: 15,
+        alignItems: 'center',
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.05,
+        shadowRadius: 8,
+        elevation: 3,
+    },
+    iconContainer: {
+        width: 60, height: 60, borderRadius: 16, backgroundColor: '#F3E8FF',
+        justifyContent: 'center', alignItems: 'center', marginRight: 15
+    },
+    cardContent: { flex: 1 },
+    cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 },
     deckName: { fontSize: 18, fontWeight: '600', color: '#1F2937' },
-    deckWordCount: { fontSize: 14, color: '#6B7280', marginVertical: 4 },
-    progressBarContainer: { height: 6, backgroundColor: 'rgba(0,0,0,0.1)', borderRadius: 3, marginTop: 5, overflow: 'hidden' },
-    progressBar: { height: '100%', backgroundColor: '#8B5CF6', borderRadius: 3 },
-    errorText: { fontSize: 18, color: '#EF4444', textAlign: 'center', marginBottom: 20 },
-    retryButton: { fontSize: 16, color: '#8B5CF6', fontWeight: 'bold' },
+    wordCount: { fontSize: 14, color: '#6B7280', marginBottom: 8 },
+    progressWrapper: { flexDirection: 'row', alignItems: 'center' },
+    progressText: { fontSize: 12, color: '#6B7280', fontWeight: '500' },
+
+    // Empty State
+    emptyState: { alignItems: 'center', marginTop: 50, opacity: 0.7 },
+    emptyText: { marginTop: 10, fontSize: 16, color: '#6B7280', textAlign: 'center' },
 });
