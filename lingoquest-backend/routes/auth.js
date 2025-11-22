@@ -1,8 +1,7 @@
-// backend/routes/auth.js
 const express = require('express');
 const router = express.Router();
 const authMiddleware = require('../middleware/auth');
-const uploadMiddleware = require('../middleware/upload'); // Import middleware vừa tạo
+const uploadMiddleware = require('../middleware/upload'); 
 const authController = require('../controllers/authController');
 
 router.post('/register', authController.register);

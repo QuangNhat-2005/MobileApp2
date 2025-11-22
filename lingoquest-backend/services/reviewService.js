@@ -1,7 +1,5 @@
-// services/reviewService.js
 const UserWord = require('../models/UserWord');
 const mongoose = require('mongoose');
-
 const getWordsForReview = async (userId, limit = 10) => {
     // Logic nghiệp vụ nằm ở đây
     const wordsToReview = await UserWord.aggregate([
@@ -29,7 +27,6 @@ const getWordsForReview = async (userId, limit = 10) => {
         text: item.wordDetails.text,
         meaning: item.wordDetails.meaning,
         example: item.wordDetails.example,
-        // Có thể thêm các trường khác nếu cần
     }));
 };
 

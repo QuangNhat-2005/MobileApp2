@@ -1,14 +1,14 @@
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { Tabs, useRouter } from 'expo-router';
 import { Platform } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context'; // 1. Import cái này
+import { useSafeAreaInsets } from 'react-native-safe-area-context'; 
 import { useSound } from '../../hooks/useSound';
 
 export default function TabLayout() {
   const router = useRouter();
   const playSound = useSound();
 
-  // 2. Lấy thông số vùng an toàn của thiết bị hiện tại
+
   const insets = useSafeAreaInsets();
 
   return (
@@ -26,10 +26,6 @@ export default function TabLayout() {
 
         tabBarStyle: {
           position: 'absolute',
-          // 3. LOGIC TỰ ĐỘNG ĐIỀU CHỈNH VỊ TRÍ:
-          // - Web: Cách đáy 25px (như cũ).
-          // - Mobile: Cách đáy 15px + Chiều cao của thanh điều hướng hệ thống (insets.bottom).
-          // -> Đảm bảo luôn nằm trên thanh gạch ngang của điện thoại.
           bottom: Platform.OS === 'web' ? 25 : (15 + insets.bottom),
 
           left: 20,
@@ -40,8 +36,7 @@ export default function TabLayout() {
           height: 70,
           borderTopWidth: 0,
 
-          // Canh chỉnh nội dung bên trong thanh Tab cho cân đối
-          paddingBottom: Platform.OS === 'ios' ? 0 : 10, // iOS tự căn rồi, Android cần đẩy lên xíu
+          paddingBottom: Platform.OS === 'ios' ? 0 : 10, 
           paddingTop: 10,
 
           shadowColor: '#000',

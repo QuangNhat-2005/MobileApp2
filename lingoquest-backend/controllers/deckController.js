@@ -1,4 +1,3 @@
-// backend/controllers/deckController.js
 const deckService = require('../services/deckService');
 
 exports.getAllDecks = async (req, res) => {

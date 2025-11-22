@@ -1,4 +1,3 @@
-// backend/services/authService.js
 const User = require('../models/User');
 const UserWord = require('../models/UserWord');
 const bcrypt = require('bcryptjs');
@@ -19,12 +18,12 @@ const registerUser = async ({ username, email, password }) => {
     return token;
 };
 
-const loginUser = async ({ email, password }) => {
-    const user = await User.findOne({ email });
-    if (!user) throw new Error('Email hoặc mật khẩu không chính xác');
+const loginUser = async ({ username, password }) => {
+    const user = await User.findOne({ username });
+    if (!user) throw new Error('Username hoặc mật khẩu không chính xác');
 
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) throw new Error('Email hoặc mật khẩu không chính xác');
+    if (!isMatch) throw new Error('Username hoặc mật khẩu không chính xác');
 
     const payload = { user: { id: user.id } };
     const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '7d' });

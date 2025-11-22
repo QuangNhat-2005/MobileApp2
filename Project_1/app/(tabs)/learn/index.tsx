@@ -20,7 +20,7 @@ export default function LearnScreen() {
     const [isLoading, setIsLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
 
-    // State để kiểm tra xem người dùng có đang bấm vào ô tìm kiếm không
+    
     const [isFocused, setIsFocused] = useState(false);
 
     const router = useRouter();
@@ -66,15 +66,15 @@ export default function LearnScreen() {
                 <Text style={styles.title}>Choose Your Topic</Text>
             </View>
 
-            {/* --- SEARCH BAR NÂNG CẤP --- */}
+
             <View style={[
                 styles.searchContainer,
-                isFocused && styles.searchContainerFocused // Đổi style khi focus
+                isFocused && styles.searchContainerFocused 
             ]}>
                 <Ionicons
                     name="search"
                     size={22}
-                    // Icon đổi màu khi focus
+                    
                     color={isFocused ? "#8B5CF6" : "#9CA3AF"}
                     style={styles.searchIcon}
                 />
@@ -89,11 +89,11 @@ export default function LearnScreen() {
                     onChangeText={setSearchQuery}
                     autoCorrect={false}
 
-                    // Xử lý sự kiện Focus/Blur để đổi giao diện
+                   
                     onFocus={() => setIsFocused(true)}
                     onBlur={() => setIsFocused(false)}
 
-                    // Màu con trỏ và màu bôi đen
+                   
                     cursorColor="#8B5CF6"
                     selectionColor="rgba(139, 92, 246, 0.3)"
                 />
@@ -163,7 +163,7 @@ const styles = StyleSheet.create({
     header: { paddingTop: 60, paddingBottom: 20, paddingHorizontal: 20, alignItems: 'center' },
     title: { fontSize: 28, fontWeight: 'bold', color: '#1F2937' },
 
-    // --- Search Bar Styles (Đã nâng cấp) ---
+
     searchContainer: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -171,23 +171,23 @@ const styles = StyleSheet.create({
         marginHorizontal: 20,
         marginBottom: 20,
         paddingHorizontal: 15,
-        height: 55, // Cao hơn một chút cho dễ bấm
-        borderRadius: 16, // Bo góc vừa phải, hiện đại hơn
+        height: 55, 
+        borderRadius: 16, 
         borderWidth: 1.5,
-        borderColor: 'transparent', // Mặc định không viền màu
+        borderColor: 'transparent', 
 
-        // Bóng đổ nhẹ mặc định
+
         shadowColor: "#000",
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.05,
         shadowRadius: 5,
         elevation: 2,
     },
-    // Style khi đang bấm vào (Focus)
+
     searchContainerFocused: {
-        borderColor: '#8B5CF6', // Viền tím sáng lên
-        backgroundColor: '#F5F3FF', // Nền chuyển sang tím cực nhạt
-        shadowColor: "#8B5CF6", // Bóng đổ màu tím
+        borderColor: '#8B5CF6', 
+        backgroundColor: '#F5F3FF', 
+        shadowColor: "#8B5CF6", 
         shadowOpacity: 0.2,
         shadowRadius: 8,
         elevation: 5,
@@ -198,12 +198,12 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: '#1F2937',
         height: '100%',
-        fontWeight: '500' // Chữ đậm hơn một chút cho rõ
+        fontWeight: '500' 
     },
 
     scrollContent: { paddingHorizontal: 20, paddingBottom: 100 },
 
-    // Deck Card Styles
+
     deckCard: {
         flexDirection: 'row',
         backgroundColor: '#fff',
@@ -228,7 +228,7 @@ const styles = StyleSheet.create({
     progressWrapper: { flexDirection: 'row', alignItems: 'center' },
     progressText: { fontSize: 12, color: '#6B7280', fontWeight: '500' },
 
-    // Empty State
+
     emptyState: { alignItems: 'center', marginTop: 50, opacity: 0.7 },
     emptyText: { marginTop: 10, fontSize: 16, color: '#6B7280', textAlign: 'center' },
 });

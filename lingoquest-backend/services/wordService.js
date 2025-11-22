@@ -1,4 +1,3 @@
-// backend/services/wordService.js
 const UserWord = require('../models/UserWord');
 const Word = require('../models/Word');
 const User = require('../models/User');
@@ -48,7 +47,7 @@ const processAnswer = async (userId, wordId, isCorrect) => {
     // Logic SRS (Spaced Repetition System)
     if (isCorrect) {
         userWord.proficiencyLevel += 1;
-        updateUserXpAndLevel(user, 10); // Cộng XP
+        updateUserXpAndLevel(user, 10); 
     } else {
         userWord.proficiencyLevel = Math.max(0, userWord.proficiencyLevel - 1);
     }

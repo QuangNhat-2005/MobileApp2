@@ -197,7 +197,7 @@ export default function LessonSessionScreen() {
                     <View style={styles.progressBarContainer}><View style={[styles.progressBar, { width: `${progress}%` }]} /></View>
                 </View>
 
-                {/* Content - Dùng ScrollView để cuộn được nếu màn hình bé */}
+                {/* Content - */}
                 <ScrollView contentContainerStyle={styles.scrollContent}>
                     <View style={styles.promptContainer}>
                         <Text style={styles.promptHelperText}>
@@ -220,7 +220,7 @@ export default function LessonSessionScreen() {
                     </View>
                 </ScrollView>
 
-                {/* Footer - Hiện đè lên trên */}
+                {/* Footer - */}
                 {selectedAnswer && (
                     <View style={[styles.footer, isCorrect ? styles.footerCorrect : styles.footerIncorrect]}>
                         <View style={{ flex: 1 }}>
@@ -251,12 +251,11 @@ const styles = StyleSheet.create({
     progressBarContainer: { flex: 1, height: 8, backgroundColor: '#E5E7EB', borderRadius: 4, marginLeft: 15 },
     progressBar: { height: '100%', backgroundColor: '#8B5CF6', borderRadius: 4 },
 
-    // SỬA STYLE Ở ĐÂY:
+
     scrollContent: {
         flexGrow: 1,
         justifyContent: 'space-between',
         padding: 20,
-        // Quan trọng: Thêm padding dưới đáy thật lớn để nội dung không bị Footer che mất
         paddingBottom: 150
     },
 
@@ -282,7 +281,6 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        // Thêm bóng đổ cho footer nổi bật
         shadowColor: "#000",
         shadowOffset: { width: 0, height: -2 },
         shadowOpacity: 0.1,

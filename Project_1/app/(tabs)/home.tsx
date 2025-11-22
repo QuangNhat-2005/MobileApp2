@@ -5,7 +5,7 @@ import React from 'react';
 import { ActivityIndicator, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import * as Progress from 'react-native-progress';
 
-// Import Hook & Components
+
 import apiClient from '../../api/axiosConfig';
 import { StatItem } from '../../components/home/StatItem';
 import { GlassCard } from '../../components/ui/GlassCard';
@@ -25,7 +25,7 @@ export default function HomeScreen() {
     // Hàm xử lý khi bấm vào Avatar
     const handleProfilePress = () => {
         playSound('click');
-        router.push('/editProfile'); // Chuyển sang trang Edit Profile
+        router.push('/editProfile'); 
     };
 
     if (isLoading || !stats) {
@@ -46,7 +46,7 @@ export default function HomeScreen() {
                 <View style={styles.header}>
                     <Text style={styles.greeting}>Your Quest Awaits, {stats.username}!</Text>
 
-                    {/* SỬA Ở ĐÂY: Thêm TouchableOpacity bao quanh Image */}
+                   
                     <TouchableOpacity onPress={handleProfilePress}>
                         <Image
                             key={fullAvatarUrl}
@@ -105,7 +105,6 @@ const styles = StyleSheet.create({
     scrollContent: { padding: 20, paddingTop: 60, paddingBottom: 100 },
     header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 30 },
     greeting: { fontSize: 22, fontWeight: '600', color: '#1F2937', flex: 1 },
-    // Thêm border cho avatar để nhìn nổi bật hơn khi bấm được
     avatar: { width: 45, height: 45, borderRadius: 22.5, borderWidth: 2, borderColor: '#fff', backgroundColor: '#ddd' },
     cardTitle: { fontSize: 18, fontWeight: '500', color: '#374151', marginBottom: 20 },
     progressContainer: { marginBottom: 25 },

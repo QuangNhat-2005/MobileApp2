@@ -1,9 +1,6 @@
-// File: context/SoundContext.tsx
-
 import { Audio } from 'expo-av';
 import React, { createContext, useContext, useEffect, useRef } from 'react';
 
-// Định nghĩa các file âm thanh
 const soundFiles = {
     correct: require('../assets/sounds/correct.mp3'),
     incorrect: require('../assets/sounds/incorrect.mp3'),
@@ -14,12 +11,11 @@ const soundFiles = {
 };
 type SoundKey = keyof typeof soundFiles;
 
-// Tạo Context
+
 const SoundContext = createContext<{ playSound: (soundKey: SoundKey) => void }>({
     playSound: () => console.warn('SoundProvider chưa sẵn sàng'),
 });
 
-// Tạo "Người Quản lý" (Provider)
 export const SoundProvider = ({ children }: { children: React.ReactNode }) => {
     const soundObjects = useRef<Partial<Record<SoundKey, Audio.Sound>>>({});
     const isLoading = useRef(false);
@@ -47,10 +43,8 @@ export const SoundProvider = ({ children }: { children: React.ReactNode }) => {
     };
 
     useEffect(() => {
-        // Chỉ khởi chạy quá trình tải MỘT LẦN DUY NHẤT
         loadingPromise.current = loadAllSounds();
 
-        // Hàm dọn dẹp khi app bị đóng hoàn toàn (hiếm khi cần trên mobile)
         return () => {
             console.log('SoundProvider: Dọn dẹp tất cả âm thanh...');
             Object.values(soundObjects.current).forEach(sound => sound?.unloadAsync());
@@ -58,7 +52,6 @@ export const SoundProvider = ({ children }: { children: React.ReactNode }) => {
     }, []);
 
     const playSound = async (soundKey: SoundKey) => {
-        // Luôn chờ cho đến khi quá trình tải hoàn tất
         if (loadingPromise.current) {
             await loadingPromise.current;
         }
@@ -82,5 +75,5 @@ export const SoundProvider = ({ children }: { children: React.ReactNode }) => {
     );
 };
 
-// Hook để các component con dễ dàng gọi "Người Quản lý"
+
 export const useSoundPlayer = () => useContext(SoundContext);

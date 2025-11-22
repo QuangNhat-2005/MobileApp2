@@ -11,7 +11,6 @@ interface CustomAlertProps {
 }
 
 export const CustomAlert: React.FC<CustomAlertProps> = ({ visible, title, message, type = 'success', onClose }) => {
-    // Chọn màu và icon dựa trên loại thông báo
     const getAlertStyle = () => {
         switch (type) {
             case 'error':
@@ -35,7 +34,7 @@ export const CustomAlert: React.FC<CustomAlertProps> = ({ visible, title, messag
         >
             <View style={styles.overlay}>
                 <View style={styles.alertBox}>
-                    {/* Icon nằm trên cùng */}
+                    {/* Icon  */}
                     <View style={[styles.iconCircle, { backgroundColor: `${color}20` }]}> 
                         <Ionicons name={icon} size={40} color={color} />
                     </View>
@@ -59,7 +58,7 @@ export const CustomAlert: React.FC<CustomAlertProps> = ({ visible, title, messag
 const styles = StyleSheet.create({
     overlay: {
         flex: 1,
-        backgroundColor: 'rgba(0, 0, 0, 0.5)', // Nền đen mờ
+        backgroundColor: 'rgba(0, 0, 0, 0.5)', 
         justifyContent: 'center',
         alignItems: 'center',
     },

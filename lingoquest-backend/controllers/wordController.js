@@ -1,4 +1,3 @@
-// backend/controllers/wordController.js
 const wordService = require('../services/wordService');
 const mongoose = require('mongoose');
 
@@ -10,7 +9,7 @@ exports.submitAnswer = async (req, res) => {
 
     try {
         await wordService.processAnswer(req.user.id, wordId, isCorrect);
-        res.status(204).send(); // 204 No Content (Thành công nhưng không trả về data gì)
+        res.status(204).send(); 
     } catch (err) {
         console.error("Lỗi submitAnswer:", err.message);
         res.status(500).send('Lỗi Server');

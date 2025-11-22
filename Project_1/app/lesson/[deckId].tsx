@@ -1,8 +1,6 @@
-// File: app/(tabs)/deck/[deckId].tsx (PHIÊN BẢN SỬA LỖI LOADING)
-
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useCallback, useState } from 'react'; // Import thêm useCallback
+import React, { useCallback, useState } from 'react'; 
 import { ActivityIndicator, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import apiClient from '../../api/axiosConfig';
 

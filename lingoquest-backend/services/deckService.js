@@ -1,4 +1,3 @@
-// backend/services/deckService.js
 const Deck = require('../models/Deck');
 const Word = require('../models/Word');
 const UserWord = require('../models/UserWord');

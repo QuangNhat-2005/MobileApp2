@@ -131,7 +131,7 @@ export default function ProfileScreen() {
     return (
         <LinearGradient colors={['#fde6f3', '#e4eefd', '#f0eaff']} style={styles.container}>
             <ScrollView contentContainerStyle={styles.scrollContent}>
-                
+
                 {/* --- AVATAR SECTION --- */}
                 <View style={styles.glassCard}>
                     <Image

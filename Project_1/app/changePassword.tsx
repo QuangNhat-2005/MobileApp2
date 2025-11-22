@@ -244,7 +244,7 @@ const styles = StyleSheet.create({
         borderColor: '#E5E7EB',
     },
     
-    // Style cho thanh độ mạnh mật khẩu
+
     strengthContainer: { marginTop: 8, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
     strengthBarBackground: { flex: 1, height: 6, backgroundColor: '#E5E7EB', borderRadius: 3, marginRight: 10, overflow: 'hidden' },
     strengthBarFill: { height: '100%', borderRadius: 3 },

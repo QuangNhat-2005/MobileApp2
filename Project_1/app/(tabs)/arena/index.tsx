@@ -81,7 +81,7 @@ export default function ArenaScreen() {
                     </GlassCard>
                 </View>
 
-                {/* --- SỬA LỖI NÚT START Ở ĐÂY --- */}
+
                 <TouchableOpacity
                     style={styles.playButtonContainer}
                     onPress={handleStartSprint}
@@ -140,11 +140,11 @@ const styles = StyleSheet.create({
     statLabel: { fontSize: 13, color: '#6B7280', fontWeight: '500' },
     statValue: { fontSize: 20, fontWeight: '800', color: '#1F2937', marginTop: 2 },
 
-    // --- STYLE ĐÃ SỬA CHO NÚT START ---
+
     playButtonContainer: {
         marginBottom: 30,
-        borderRadius: 32, // Bo tròn container khớp với nút
-        backgroundColor: 'transparent', // Nền trong suốt để không bị lòi màu trắng
+        borderRadius: 32, 
+        backgroundColor: 'transparent', 
         shadowColor: "#8B5CF6",
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,

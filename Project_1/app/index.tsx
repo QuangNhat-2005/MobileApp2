@@ -22,7 +22,6 @@ import Animated, { useAnimatedStyle, useSharedValue, withDelay, withTiming } fro
 import apiClient from '../api/axiosConfig';
 import styles from '../styles/AuthScreen.styles';
 
-// --- 1. COMPONENT FIX LỖI BẤM 2 LẦN TRÊN WEB ---
 const KeyboardWrapper = ({ children }: { children: React.ReactNode }) => {
     if (Platform.OS === 'web') {
         return <View style={{ flex: 1 }}>{children}</View>;
@@ -34,14 +33,14 @@ const KeyboardWrapper = ({ children }: { children: React.ReactNode }) => {
     );
 };
 
-// --- 2. INPUT ĐƠN GIẢN (ĐÃ XÓA MÀU MÈ) ---
+
 const StyledTextInput = (props: TextInputProps) => {
     return (
         <View style={styles.inputWrapper}>
             <TextInput
                 style={[
                     styles.input,
-                    // Tắt khung đen xấu xí trên Web
+                    
                     Platform.OS === 'web' && ({ outlineStyle: 'none' } as any)
                 ]}
                 placeholderTextColor="#9ca3af"
@@ -84,14 +83,14 @@ export default function AuthScreen() {
         try {
             let token;
             if (isLogin) {
-                // --- LOGIN: Gửi Username thay vì Email ---
+               
                 const response = await apiClient.post('/api/auth/login', {
-                    username: username, // Dùng biến username
+                    username: username, 
                     password: password
                 });
                 token = response.data.token;
             } else {
-                // --- REGISTER: Gửi cả Username và Email ---
+               
                 if (password !== confirmPassword) {
                     throw new Error("Mật khẩu xác nhận không khớp");
                 }
@@ -109,7 +108,7 @@ export default function AuthScreen() {
                 } else {
                     await SecureStore.setItemAsync('userToken', token);
                 }
-                // Cập nhật header cho các request sau
+                
                 apiClient.defaults.headers.common['x-auth-token'] = token;
                 router.replace('/(tabs)/home');
             }
@@ -122,12 +121,12 @@ export default function AuthScreen() {
         }
     };
 
-    // --- FORM LOGIN (CHỈ CẦN USERNAME & PASS) ---
+    
     const renderLoginForm = () => (
         <>
             <StyledTextInput
-                placeholder="Username" // Đổi label thành Username
-                value={username}       // Bind vào biến username
+                placeholder="Username" 
+                value={username}       
                 onChangeText={setUsername}
                 autoCapitalize="none"
             />
@@ -140,7 +139,7 @@ export default function AuthScreen() {
         </>
     );
 
-    // --- FORM SIGNUP (CẦN CẢ EMAIL ĐỂ ĐĂNG KÝ) ---
+   
     const renderSignUpForm = () => (
         <>
             <StyledTextInput

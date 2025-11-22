@@ -1,4 +1,3 @@
-// controllers/reviewController.js
 const reviewService = require('../services/reviewService');
 
 exports.getReviewSession = async (req, res) => {
