@@ -1,12 +1,11 @@
-import { FontAwesome5, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { FontAwesome5, MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Platform, StatusBar, StyleSheet, Text, TextStyle, TouchableOpacity, View, ViewStyle } from 'react-native';
+import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View, Platform, StatusBar, ViewStyle, TextStyle, ScrollView } from 'react-native';
 import apiClient from '../../../api/axiosConfig';
 import { useSound } from '../../../hooks/useSound';
 
-// --- ĐỊNH NGHĨA KIỂU DỮ LIỆU ---
 interface Option { text: string; isCorrect: boolean; }
 interface Question {
     wordId: string;
@@ -29,7 +28,6 @@ export default function SprintScreen() {
     const router = useRouter();
     const playSound = useSound();
 
-    // --- STATE QUẢN LÝ UI ---
     const [gamePhase, setGamePhase] = useState<GamePhase>('loading');
     const [questions, setQuestions] = useState<Question[]>([]);
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -40,7 +38,6 @@ export default function SprintScreen() {
     const [feedback, setFeedback] = useState<{ selected: string; correct: boolean } | null>(null);
     const [finalResult, setFinalResult] = useState<FinalResult | null>(null);
 
-    // --- REFS ---
     const scoreRef = useRef(0);
     const correctCountRef = useRef(0);
     const wrongCountRef = useRef(0);
@@ -49,7 +46,6 @@ export default function SprintScreen() {
     const gameTimerRef = useRef<any>(null);
     const countdownTimerRef = useRef<any>(null);
 
-    // --- 1. KHỞI TẠO ---
     useEffect(() => {
         const fetchQuestions = async () => {
             try {
@@ -67,7 +63,7 @@ export default function SprintScreen() {
             }
         };
         fetchQuestions();
-
+        
         return () => {
             if (gameTimerRef.current) clearInterval(gameTimerRef.current);
             if (countdownTimerRef.current) clearInterval(countdownTimerRef.current);
@@ -87,7 +83,6 @@ export default function SprintScreen() {
         }
     };
 
-    // --- 2. ĐẾM NGƯỢC ---
     useEffect(() => {
         if (gamePhase === 'countdown') {
             countdownTimerRef.current = setInterval(() => {
@@ -104,7 +99,6 @@ export default function SprintScreen() {
         return () => clearInterval(countdownTimerRef.current);
     }, [gamePhase]);
 
-    // --- 3. ĐỒNG HỒ GAME ---
     useEffect(() => {
         if (gamePhase === 'playing') {
             gameTimerRef.current = setInterval(() => {
@@ -157,7 +151,7 @@ export default function SprintScreen() {
             const finalWrong = wrongCountRef.current;
 
             const response = await apiClient.post('/api/arena/sprint-results', { score: finalScore });
-
+            
             setFinalResult({
                 score: finalScore,
                 correctCount: finalCorrect,
@@ -186,8 +180,6 @@ export default function SprintScreen() {
         setGamePhase('countdown');
     };
 
-    // --- RENDER GIAO DIỆN ---
-
     if (gamePhase === 'loading') {
         return (
             <LinearGradient colors={['#fde6f3', '#e4eefd', '#f0eaff']} style={styles.centerContainer}>
@@ -210,7 +202,7 @@ export default function SprintScreen() {
             <LinearGradient colors={['#fde6f3', '#e4eefd', '#f0eaff']} style={styles.centerContainer}>
                 <View style={styles.resultCard}>
                     <Text style={styles.resultTitle}>Time&apos;s Up!</Text>
-
+                    
                     {finalResult?.newHighScore && (
                         <View style={styles.highScoreBadge}>
                             <FontAwesome5 name="crown" size={16} color="#B45309" />
@@ -237,7 +229,7 @@ export default function SprintScreen() {
                     <TouchableOpacity style={styles.primaryButton} onPress={handlePlayAgain}>
                         <Text style={styles.primaryButtonText}>Play Again</Text>
                     </TouchableOpacity>
-
+                    
                     <TouchableOpacity onPress={handleBack} style={styles.secondaryButton}>
                         <Text style={styles.secondaryButtonText}>Back to Arena</Text>
                     </TouchableOpacity>
@@ -252,83 +244,95 @@ export default function SprintScreen() {
     return (
         <LinearGradient colors={['#fde6f3', '#e4eefd', '#f0eaff']} style={styles.gameContainer}>
             <StatusBar barStyle="dark-content" />
+            
+          
+            <ScrollView 
+                contentContainerStyle={styles.scrollContent} 
+                showsVerticalScrollIndicator={false}
+            >
+                <View style={styles.header}>
+                    <View style={[styles.statBox, timeLeft <= 10 && styles.statBoxDanger]}>
+                        <MaterialCommunityIcons name="clock-outline" size={20} color={timeLeft <= 10 ? "#EF4444" : "#6B7280"} />
+                        <Text style={[styles.statText, timeLeft <= 10 && styles.textDanger]}>{timeLeft}s</Text>
+                    </View>
 
-            <View style={styles.header}>
-                <View style={[styles.statBox, timeLeft <= 10 && styles.statBoxDanger]}>
-                    <MaterialCommunityIcons name="clock-outline" size={20} color={timeLeft <= 10 ? "#EF4444" : "#6B7280"} />
-                    <Text style={[styles.statText, timeLeft <= 10 && styles.textDanger]}>{timeLeft}s</Text>
+                    <View style={styles.scoreContainer}>
+                        <Text style={styles.scoreLabel}>SCORE</Text>
+                        <Text style={styles.scoreText}>{score}</Text>
+                    </View>
+
+                    <View style={[styles.statBox, streak > 2 && styles.statBoxFire]}>
+                        <MaterialCommunityIcons name="fire" size={20} color={streak > 2 ? "#F59E0B" : "#6B7280"} />
+                        <Text style={[styles.statText, streak > 2 && styles.textFire]}>{streak}</Text>
+                    </View>
                 </View>
 
-                <View style={styles.scoreContainer}>
-                    <Text style={styles.scoreLabel}>SCORE</Text>
-                    <Text style={styles.scoreText}>{score}</Text>
+                <View style={styles.questionArea}>
+                    <View style={styles.questionCard}>
+                        <Text style={styles.promptLabel}>
+                            {currentQuestion.promptText.includes(' ') ? 'What is the meaning of:' : 'Choose the word for:'}
+                        </Text>
+                        <Text style={styles.promptWord}>{currentQuestion.promptText}</Text>
+                    </View>
                 </View>
 
-                <View style={[styles.statBox, streak > 2 && styles.statBoxFire]}>
-                    <MaterialCommunityIcons name="fire" size={20} color={streak > 2 ? "#F59E0B" : "#6B7280"} />
-                    <Text style={[styles.statText, streak > 2 && styles.textFire]}>{streak}</Text>
-                </View>
-            </View>
+                <View style={styles.optionsContainer}>
+                    {currentQuestion.options.map((option, index) => {
+                        const isSelected = feedback?.selected === option.text;
+                        const isCorrect = feedback?.correct;
 
-            <View style={styles.questionArea}>
-                <View style={styles.questionCard}>
-                    <Text style={styles.promptLabel}>
-                        {currentQuestion.promptText.includes(' ') ? 'What is the meaning of:' : 'Choose the word for:'}
-                    </Text>
-                    <Text style={styles.promptWord}>{currentQuestion.promptText}</Text>
-                </View>
-            </View>
+                        let buttonStyle: ViewStyle = { ...styles.optionButton };
+                        let textStyle: TextStyle = { ...styles.optionText };
+                        let iconName = null;
 
-            <View style={styles.optionsContainer}>
-                {currentQuestion.options.map((option, index) => {
-                    const isSelected = feedback?.selected === option.text;
-                    const isCorrect = feedback?.correct;
-
-                    
-                    let buttonStyle: ViewStyle = { ...styles.optionButton };
-                    let textStyle: TextStyle = { ...styles.optionText };
-                    let iconName = null;
-
-                    if (isSelected) {
-                        if (isCorrect) {
-                            Object.assign(buttonStyle, styles.correctOption);
+                        if (isSelected) {
+                            if (isCorrect) {
+                                Object.assign(buttonStyle, styles.correctOption);
+                                Object.assign(textStyle, styles.textWhite);
+                                iconName = "checkmark-circle";
+                            } else {
+                                Object.assign(buttonStyle, styles.incorrectOption);
+                                Object.assign(textStyle, styles.textWhite);
+                                iconName = "close-circle";
+                            }
+                        } else if (feedback && option.isCorrect) {
+                            Object.assign(buttonStyle, styles.correctOption, { opacity: 0.7 });
                             Object.assign(textStyle, styles.textWhite);
-                            iconName = "checkmark-circle";
-                        } else {
-                            Object.assign(buttonStyle, styles.incorrectOption);
-                            Object.assign(textStyle, styles.textWhite);
-                            iconName = "close-circle";
                         }
-                    } else if (feedback && option.isCorrect) {
-                        Object.assign(buttonStyle, styles.correctOption, { opacity: 0.7 });
-                        Object.assign(textStyle, styles.textWhite);
-                    }
 
-                    return (
-                        <TouchableOpacity
-                            key={index}
-                            style={buttonStyle}
-                            onPress={() => handleAnswerSelect(option)}
-                            disabled={!!feedback}
-                            activeOpacity={0.8}
-                        >
-                            <Text style={textStyle}>{option.text}</Text>
-                            {iconName && (
-                                <Ionicons name={iconName as any} size={24} color="#fff" style={{ position: 'absolute', right: 20 }} />
-                            )}
-                        </TouchableOpacity>
-                    );
-                })}
-            </View>
-
-            <Text style={styles.footerText}>Question {currentIndex + 1}</Text>
+                        return (
+                            <TouchableOpacity
+                                key={index}
+                                style={buttonStyle}
+                                onPress={() => handleAnswerSelect(option)}
+                                disabled={!!feedback}
+                                activeOpacity={0.8}
+                            >
+                                <Text style={textStyle}>{option.text}</Text>
+                                {iconName && (
+                                    <Ionicons name={iconName as any} size={24} color="#fff" style={{position: 'absolute', right: 20}} />
+                                )}
+                            </TouchableOpacity>
+                        );
+                    })}
+                </View>
+                
+                <Text style={styles.footerText}>Question {currentIndex + 1}</Text>
+            </ScrollView>
         </LinearGradient>
     );
 }
 
 const styles = StyleSheet.create({
     centerContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 },
-    gameContainer: { flex: 1, paddingTop: 60, paddingHorizontal: 20 },
+    gameContainer: { flex: 1 },
+    
+    // --- STYLE QUAN TRỌNG ĐỂ FIX LỖI CHE MẤT ---
+    scrollContent: { 
+        paddingTop: 60, 
+        paddingHorizontal: 20,
+        paddingBottom: 160 // Tăng khoảng trống đáy lên cực lớn
+    },
 
     countdownLabel: { color: 'rgba(255,255,255,0.8)', fontSize: 24, fontWeight: '600', marginBottom: 20 },
     countdownText: { fontSize: 120, fontWeight: 'bold', color: '#fff' },
@@ -340,12 +344,12 @@ const styles = StyleSheet.create({
     statText: { fontSize: 16, fontWeight: 'bold', color: '#374151' },
     textDanger: { color: '#EF4444' },
     textFire: { color: '#D97706' },
-
+    
     scoreContainer: { alignItems: 'center' },
     scoreLabel: { fontSize: 10, fontWeight: 'bold', color: '#8B5CF6', letterSpacing: 1 },
     scoreText: { fontSize: 32, fontWeight: '900', color: '#8B5CF6' },
 
-    questionArea: { flex: 1, justifyContent: 'center', marginBottom: 20 },
+    questionArea: { marginBottom: 20 },
     questionCard: { backgroundColor: '#fff', borderRadius: 24, padding: 30, alignItems: 'center', justifyContent: 'center', shadowColor: "#8B5CF6", shadowOffset: { width: 0, height: 10 }, shadowOpacity: 0.15, shadowRadius: 20, elevation: 10, minHeight: 200 },
     promptLabel: { fontSize: 14, color: '#6B7280', textTransform: 'uppercase', marginBottom: 15, fontWeight: '600' },
     promptWord: { fontSize: 32, fontWeight: 'bold', color: '#1F2937', textAlign: 'center' },
@@ -353,7 +357,7 @@ const styles = StyleSheet.create({
     optionsContainer: { gap: 12, marginBottom: 20 },
     optionButton: { backgroundColor: '#fff', paddingVertical: 18, paddingHorizontal: 20, borderRadius: 16, alignItems: 'center', justifyContent: 'center', shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 2, borderWidth: 2, borderColor: 'transparent' },
     optionText: { fontSize: 18, fontWeight: '600', color: '#4B5563' },
-
+    
     correctOption: { backgroundColor: '#10B981', borderColor: '#059669' },
     incorrectOption: { backgroundColor: '#EF4444', borderColor: '#B91C1C' },
     textWhite: { color: '#fff' },
@@ -364,14 +368,14 @@ const styles = StyleSheet.create({
     resultTitle: { fontSize: 28, fontWeight: 'bold', color: '#1F2937', marginBottom: 20 },
     highScoreBadge: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#FEF3C7', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20, marginBottom: 20, gap: 6 },
     newHighScoreText: { color: '#B45309', fontWeight: 'bold', fontSize: 12 },
-
+    
     resultScore: { fontSize: 64, fontWeight: '900', color: '#8B5CF6', marginBottom: 30 },
     statsRow: { flexDirection: 'row', gap: 40, marginBottom: 40 },
     statItem: { alignItems: 'center' },
     statValue: { fontSize: 24, fontWeight: 'bold', color: '#1F2937', marginTop: 5 },
     statLabel: { fontSize: 12, color: '#6B7280' },
-
-    primaryButton: { backgroundColor: '#8B5CF6', width: '100%', paddingVertical: 16, borderRadius: 16, alignItems: 'center', marginBottom: 12, shadowColor: "#8B5CF6", shadowOpacity: 0.3, shadowOffset: { width: 0, height: 4 }, elevation: 5 },
+    
+    primaryButton: { backgroundColor: '#8B5CF6', width: '100%', paddingVertical: 16, borderRadius: 16, alignItems: 'center', marginBottom: 12, shadowColor: "#8B5CF6", shadowOpacity: 0.3, shadowOffset: {width: 0, height: 4}, elevation: 5 },
     primaryButtonText: { color: '#fff', fontSize: 18, fontWeight: 'bold' },
     secondaryButton: { paddingVertical: 12 },
     secondaryButtonText: { color: '#6B7280', fontSize: 16, fontWeight: '600' },
